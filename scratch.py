@@ -19,13 +19,13 @@ def get_currency_Data(scheduler):
     scheduler.enter(60, 1, get_currency_Data, (scheduler,))
 
     crypto_Ticker = yf.Ticker(currency_input)
-    currency_Data = crypto_Ticker.history(period="max")
+    currency_Data = crypto_Ticker.history(period="1d", interval="1h")
 
     print(currency_Data)
 
 
 ticker = yf.Ticker(currency_input)
-temp_data = ticker.history(period="max")
+temp_data = ticker.history(period="1d", interval="1h")
 print(temp_data)
 my_scheduler = sched.scheduler(time.time, time.sleep)
 my_scheduler.enter(60, 1, get_currency_Data, (my_scheduler,))
