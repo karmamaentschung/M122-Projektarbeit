@@ -63,6 +63,7 @@ class FinanceDataGUI:
 
 def main():
     root = tk.Tk()
+    root.iconbitmap("favicon.ico")
     app = FinanceDataGUI(root)
     root.geometry("800x600")  # Set the initial size of the window
     root.mainloop()
