@@ -2,7 +2,6 @@ import sched
 import time
 import yfinance as yf
 import pandas as pd
-#import openpyxl
 
 def get_currency_data(scheduler, currency_input):
     try:
@@ -14,12 +13,6 @@ def get_currency_data(scheduler, currency_input):
 
         # Display the data
         print(currency_data)
-
-        # Ask the user if they want to save the data to an Excel file
-        save_to_excel = input("Do you want to save the data to an Excel file? (yes/no): ").lower()
-        if save_to_excel == "yes":
-            currency_data.to_excel(f"{currency_input}_data.xlsx")
-            print(f"Data saved to {currency_input}_data.xlsx")
 
     except Exception as e:
         print(f"An error occurred: {e}")
