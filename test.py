@@ -2,7 +2,7 @@ import sched
 import time
 import yfinance as yf
 import pandas as pd
-import openpyxl
+#import openpyxl
 
 def get_currency_data(scheduler, currency_input):
     try:
