@@ -1,6 +1,10 @@
 import sched
 import time
 import yfinance as yf
+import pandas as pd
+# import openpyxl
+
+
 
 print("""Please choose between the following Crypto currencies to get the data from:
 -- Cryptocurrencies --
@@ -13,6 +17,9 @@ ROG
 TSLA
 """)
 currency_input = input("Enter the Currency from which you want to get the current values:   ")
+
+
+currency_data = 0
 
 def get_currency_Data(scheduler):
     # Schedule the next call first
@@ -30,3 +37,13 @@ print(temp_data)
 my_scheduler = sched.scheduler(time.time, time.sleep)
 my_scheduler.enter(60, 1, get_currency_Data, (my_scheduler,))
 my_scheduler.run()
+
+
+
+"""def writeToExcel():
+    df = pd.DataFrame(currency_data)
+    df.to_excel('currencydata.xlsx', sheet_name=currency_input)
+
+
+writeToExcel()
+"""
