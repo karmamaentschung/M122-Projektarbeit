@@ -1,34 +1,65 @@
 import tkinter as tk
-from tkinter import scrolledtext
-import subprocess
+from tkinter import ttk
+from tkinter import messagebox
+import sched
+import time
+import yfinance as yf
+import pandas as pd
 
-class GUIApp:
-    def __init__(self, root):
-        self.root = root
-        self.root.title("Simple GUI with Output Display")
+class CryptoDataGUI:
+    def __init__(self, master):
+        self.master = master
+        self.master.title("Crypto Data GUI")
 
-        # Create a Text widget for displaying output
-        self.output_text = scrolledtext.ScrolledText(root, width=50, height=10)
-        self.output_text.pack(pady=10)
+        self.currency_label = ttk.Label(self.master, text="Choose Currency:")
+        self.currency_label.pack()
 
-        # Create a button to trigger the Python script
-        self.run_button = tk.Button(root, text="Run Script", command=self.run_python_script)
-        self.run_button.pack()
+        self.currency_combobox = ttk.Combobox(self.master, values=["BTC-USD", "XRP-USD", "ETH-USD", "BLK", "ROG", "TSLA"])
+        self.currency_combobox.pack()
 
-    def run_python_script(self):
+        self.get_data_button = ttk.Button(self.master, text="Get Data", command=self.get_data)
+        self.get_data_button.pack()
+
+        self.text_output = tk.Text(self.master, wrap=tk.WORD)
+        self.text_output.pack(expand=True, fill=tk.BOTH)
+
+    def get_currency_data(self, currency_input):
         try:
-            # Run your Python script and capture the output
-            script_output = subprocess.check_output(["python", "test.py"], text=True, stderr=subprocess.STDOUT)
+            crypto_ticker = yf.Ticker(currency_input)
+            currency_data = crypto_ticker.history(period="1d", interval="1h")
 
-            # Display the output in the Text widget
-            self.output_text.insert(tk.END, script_output)
-            self.output_text.insert(tk.END, "\n")  # Add a newline for better readability
+            # Display the data
+            self.text_output.insert(tk.END, str(currency_data) + "\n")
 
-        except subprocess.CalledProcessError as e:
-            # If there is an error, display it in the Text widget
-            self.output_text.insert(tk.END, f"Error: {e.output}\n")
+        except Exception as e:
+            messagebox.showerror("Error", f"An error occurred: {e}")
+
+    def get_data(self):
+        currency_input = self.currency_combobox.get()
+
+        if not currency_input:
+            messagebox.showwarning("Warning", "Please choose a currency.")
+            return
+
+        try:
+            # Get initial data
+            ticker = yf.Ticker(currency_input)
+            temp_data = ticker.history(period="1d", interval="1m")
+            self.text_output.insert(tk.END, str(temp_data) + "\n")
+
+            # Schedule periodic data retrieval
+            my_scheduler = sched.scheduler(time.time, time.sleep)
+            my_scheduler.enter(60, 1, self.get_currency_data, (currency_input,))
+            my_scheduler.run()
+
+        except Exception as e:
+            messagebox.showerror("Error", f"An error occurred: {e}")
+
+def main():
+    root = tk.Tk()
+    app = CryptoDataGUI(root)
+    root.geometry("800x600")  # Set the initial size of the window
+    root.mainloop()
 
 if __name__ == "__main__":
-    root = tk.Tk()
-    app = GUIApp(root)
-    root.mainloop()
+    main()
