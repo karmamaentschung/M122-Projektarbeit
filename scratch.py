@@ -2,7 +2,7 @@ import sched
 import time
 import yfinance as yf
 import pandas as pd
-# import openpyxl
+#import openpyxl
 
 
 
@@ -19,7 +19,6 @@ TSLA
 currency_input = input("Enter the Currency from which you want to get the current values:   ")
 
 
-currency_data = 0
 
 def get_currency_Data(scheduler):
     # Schedule the next call first
