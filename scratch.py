@@ -1,6 +1,10 @@
 import sched
 import time
 import yfinance as yf
+import pandas as pd
+import openpyxl
+
+
 
 print("""Please choose between the following Crypto currencies to get the data from:
 -- Cryptocurrencies --
