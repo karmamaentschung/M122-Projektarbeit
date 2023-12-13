@@ -1,15 +1,19 @@
-import tkinter as tk
-from tkinter import ttk
-from tkinter import messagebox
-import sched
-import time
-import yfinance as yf
-import pandas as pd
+#--
+#
+#
+#
+#--
+
+from tkinter import *
+from sched import *
+from time import *
+from yfinance import *
+from pandas import *
 
 class CryptoDataGUI:
     def __init__(self, master):
         self.master = master
-        self.master.title("Crypto Data GUI")
+        self.master.title("Finance GUI")
 
         self.currency_label = ttk.Label(self.master, text="Choose Currency:")
         self.currency_label.pack()
