@@ -4,18 +4,20 @@
 #
 #--
 
-from tkinter import *
-from sched import *
-from time import *
-from yfinance import *
-from pandas import *
+import tkinter as tk
+from tkinter import ttk
+from tkinter import messagebox
+import sched
+import time
+import yfinance as yf
+import pandas as pd
 
-class CryptoDataGUI:
+class FinanceDataGUI:
     def __init__(self, master):
         self.master = master
-        self.master.title("Finance GUI")
+        self.master.title("Finance Tracker")
 
-        self.currency_label = ttk.Label(self.master, text="Choose Currency:")
+        self.currency_label = ttk.Label(self.master, text="Choose a crypto currency or stock:")
         self.currency_label.pack()
 
         self.currency_combobox = ttk.Combobox(self.master, values=["BTC-USD", "XRP-USD", "ETH-USD", "BLK", "ROG", "TSLA"])
@@ -61,7 +63,7 @@ class CryptoDataGUI:
 
 def main():
     root = tk.Tk()
-    app = CryptoDataGUI(root)
+    app = FinanceDataGUI(root)
     root.geometry("800x600")  # Set the initial size of the window
     root.mainloop()
 
