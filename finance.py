@@ -2,6 +2,8 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
 import yfinance as yf
+from datetime import datetime, timedelta
+import pytz
 
 class FinanzDatenGUI:
     def __init__(self, master):
@@ -23,20 +25,24 @@ class FinanzDatenGUI:
         self.timer_label = ttk.Label(self.master, text="Nächste Aktualisierung in: -")
         self.timer_label.pack()
 
-        # Initialisierung der Timer-Variable
-        self.timer_counter = 0
+        # Zeitzone für Bern, Schweiz
+        self.berlin_tz = pytz.timezone('Europe/Zurich')
 
-    def waehrungsdaten_abrufen(self, waehrungseingabe):
+        # Timer-Variable initialisieren
+        self.timer_counter = 60
+        self.timer_id = None
+
+    def waehrungsdaten_abrufen(self, waehrungseingabe, period="1d", interval="1h"):
         try:
             crypto_ticker = yf.Ticker(waehrungseingabe)
-            waehrungsdaten = crypto_ticker.history(period="1d", interval="1h")
+            waehrungsdaten = crypto_ticker.history(period=period, interval=interval)
 
             # Daten anzeigen
             self.text_ausgabe.delete(1.0, tk.END)  # Vorherige Daten löschen
             self.text_ausgabe.insert(tk.END, str(waehrungsdaten) + "\n")
 
-            # Timer aktualisieren
-            self.timer_counter = 60  # Setze Timer auf 60 Sekunden
+            # Timer-Label aktualisieren
+            self.aktualisiere_timer_label()
 
         except Exception as e:
             messagebox.showerror("Fehler", f"Ein Fehler ist aufgetreten: {e}")
@@ -50,23 +56,36 @@ class FinanzDatenGUI:
 
         try:
             # Initiale Daten abrufen
-            self.waehrungsdaten_abrufen(waehrungseingabe)
+            self.waehrungsdaten_abrufen(waehrungseingabe, period="1d", interval="1m")
 
-            # Periodischen Datenabruf planen
-            self.aktualisiere_daten(waehrungseingabe)
+            # Timer starten oder neu starten
+            if self.timer_id is not None:
+                self.master.after_cancel(self.timer_id)
+            self.starte_timer(waehrungseingabe)
 
         except Exception as e:
             messagebox.showerror("Fehler", f"Ein Fehler ist aufgetreten: {e}")
 
-    def aktualisiere_daten(self, waehrungseingabe):
-        self.waehrungsdaten_abrufen(waehrungseingabe)
-        self.timer_counter -= 1
+    def starte_timer(self, waehrungseingabe):
+        # Timer starten oder neu starten
+        self.timer_counter = 60
+        self.aktualisiere_timer_label()
+        self.timer_id = self.master.after(1000, self.aktualisiere_timer, waehrungseingabe)
 
-        if self.timer_counter > 0:
-            self.timer_label.config(text=f"Nächste Aktualisierung in: {self.timer_counter} Sekunden")
-            self.master.after(1000, self.aktualisiere_daten, waehrungseingabe)
+    def aktualisiere_timer(self, waehrungseingabe):
+        self.timer_counter -= 1
+        self.aktualisiere_timer_label()
+
+        if self.timer_counter <= 0:
+            # Timer abgelaufen, Daten aktualisieren und Timer neu starten
+            self.waehrungsdaten_abrufen(waehrungseingabe, period="1d", interval="1m")
+            self.starte_timer(waehrungseingabe)
         else:
-            self.timer_label.config(text="Nächste Aktualisierung in: -")
+            # Timer weiter aktualisieren
+            self.timer_id = self.master.after(1000, self.aktualisiere_timer, waehrungseingabe)
+
+    def aktualisiere_timer_label(self):
+        self.timer_label.config(text=f"Nächste Aktualisierung in: {self.timer_counter} Sekunden")
 
 def main():
     root = tk.Tk()
