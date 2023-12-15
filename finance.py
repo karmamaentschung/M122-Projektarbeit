@@ -130,7 +130,7 @@ def main():
     foto = tk.PhotoImage(file='appicon.png')
     root.wm_iconphoto(False, foto)
     app = FinanzDatenGUI(root)
-    root.geometry("900x650")  # Setze die Anfangsgröße des Fensters
+    root.geometry("900x650")  # Setze die Anfangsgrösse des Fensters
     root.mainloop()
 
 
