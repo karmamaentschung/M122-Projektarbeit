@@ -1,3 +1,8 @@
+#!/usr/bin/python
+################################################################
+# Datei: finance.py  
+# Autoren: Enrique Munoz, Florin Curiger und Karma Khamritshang
+################################################################
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
@@ -9,29 +14,35 @@ class FinanzDatenGUI:
     def __init__(self, master):
         self.master = master
         self.master.title("Finanz Tracker")
-        
+
         self.waehrung_label = ttk.Label(self.master, text="Wählen Sie eine Krypto-Währung oder Aktie:")
         self.waehrung_label.pack()
-        
+
         self.waehrung_combobox = ttk.Combobox(self.master, values=["BTC-USD", "XRP-USD", "ETH-USD", "BLK", "ROG", "TSLA"])
         self.waehrung_combobox.pack()
-        
+
         self.daten_abrufen_button = ttk.Button(self.master, text="Daten abrufen", command=self.daten_abrufen)
         self.daten_abrufen_button.pack()
-        
+
+        self.verlassen_button = ttk.Button(self.master, text="Verlassen", command=self.master.destroy)
+        self.verlassen_button.pack()
+
         self.text_ausgabe = tk.Text(self.master, wrap=tk.WORD)
         self.text_ausgabe.pack(expand=True, fill=tk.BOTH)
-        
+
+        self.progress_bar = ttk.Progressbar(self.master, orient=tk.HORIZONTAL, length=200, mode='determinate')
+        self.progress_bar.pack()
+
         self.timer_label = ttk.Label(self.master, text="Nächste Aktualisierung in: -")
         self.timer_label.pack()
-        
+
         # Zeitzone für Bern, Schweiz
         self.berlin_tz = pytz.timezone('Europe/Zurich')
-        
+
         # Timer-Variable initialisieren
         self.timer_counter = 60
         self.timer_id = None
-        
+
     def waehrungsdaten_abrufen(self, waehrungseingabe, period="1d", interval="1h"):
         try:
             crypto_ticker = yf.Ticker(waehrungseingabe)
@@ -56,6 +67,7 @@ class FinanzDatenGUI:
 
         try:
             # Initiale Daten abrufen
+            self.start_progress_bar()
             self.waehrungsdaten_abrufen(waehrungseingabe, period="1d", interval="1m")
 
             # Timer starten oder neu starten
@@ -65,6 +77,8 @@ class FinanzDatenGUI:
 
         except Exception as e:
             messagebox.showerror("Fehler", f"Ein Fehler ist aufgetreten: {e}")
+        finally:
+            self.stop_progress_bar()
 
     def starte_timer(self, waehrungseingabe):
         # Timer starten oder neu starten
@@ -87,6 +101,13 @@ class FinanzDatenGUI:
     def aktualisiere_timer_label(self):
         self.timer_label.config(text=f"Nächste Aktualisierung in: {self.timer_counter} Sekunden")
 
+    def start_progress_bar(self):
+        self.progress_bar.start()
+
+    def stop_progress_bar(self):
+        self.progress_bar.stop()
+
+
 def main():
     root = tk.Tk()
     foto = tk.PhotoImage(file='appicon.png')
@@ -94,6 +115,7 @@ def main():
     app = FinanzDatenGUI(root)
     root.geometry("800x600")  # Setze die Anfangsgröße des Fensters
     root.mainloop()
+
 
 if __name__ == "__main__":
     main()
