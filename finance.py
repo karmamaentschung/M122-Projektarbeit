@@ -1,4 +1,3 @@
-#!/usr/bin/python
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
@@ -10,29 +9,29 @@ class FinanzDatenGUI:
     def __init__(self, master):
         self.master = master
         self.master.title("Finanz Tracker")
-
+        
         self.waehrung_label = ttk.Label(self.master, text="Wählen Sie eine Krypto-Währung oder Aktie:")
         self.waehrung_label.pack()
-
+        
         self.waehrung_combobox = ttk.Combobox(self.master, values=["BTC-USD", "XRP-USD", "ETH-USD", "BLK", "ROG", "TSLA"])
         self.waehrung_combobox.pack()
-
+        
         self.daten_abrufen_button = ttk.Button(self.master, text="Daten abrufen", command=self.daten_abrufen)
         self.daten_abrufen_button.pack()
-
+        
         self.text_ausgabe = tk.Text(self.master, wrap=tk.WORD)
         self.text_ausgabe.pack(expand=True, fill=tk.BOTH)
-
+        
         self.timer_label = ttk.Label(self.master, text="Nächste Aktualisierung in: -")
         self.timer_label.pack()
-
+        
         # Zeitzone für Bern, Schweiz
         self.berlin_tz = pytz.timezone('Europe/Zurich')
-
+        
         # Timer-Variable initialisieren
         self.timer_counter = 60
         self.timer_id = None
-
+        
     def waehrungsdaten_abrufen(self, waehrungseingabe, period="1d", interval="1h"):
         try:
             crypto_ticker = yf.Ticker(waehrungseingabe)
