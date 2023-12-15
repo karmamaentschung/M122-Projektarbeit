@@ -13,7 +13,7 @@ import pytz
 class FinanzDatenGUI:
     def __init__(self, master):
         self.master = master
-        self.master.title("Finanz Tracker")
+        self.master.title("Finanz Tracker - Modul 122")
 
         self.waehrung_label = ttk.Label(self.master, text="Wählen Sie eine Krypto-Währung oder Aktie:")
         self.waehrung_label.pack()
@@ -23,23 +23,23 @@ class FinanzDatenGUI:
 
         self.daten_abrufen_button = ttk.Button(self.master, text="Daten abrufen", command=self.daten_abrufen)
         self.daten_abrufen_button.pack()
-
-        self.verlassen_button = ttk.Button(self.master, text="Verlassen", command=self.master.destroy)
+        
+        self.verlassen_button = ttk.Button(self.master, text="Verlassen", command=self.master.quit)
         self.verlassen_button.pack()
 
         self.text_ausgabe = tk.Text(self.master, wrap=tk.WORD)
         self.text_ausgabe.pack(expand=True, fill=tk.BOTH)
 
-        self.progress_bar = ttk.Progressbar(self.master, orient=tk.HORIZONTAL, length=200, mode='determinate')
-        self.progress_bar.pack()
-
         self.timer_label = ttk.Label(self.master, text="Nächste Aktualisierung in: -")
         self.timer_label.pack()
+        
+        self.progressbar = ttk.Progressbar(self.master, orient="horizontal", mode="determinate", length=200)
+        self.progressbar.pack()
 
-        # Zeitzone für Bern, Schweiz
+            # Zeitzone für Bern, Schweiz
         self.berlin_tz = pytz.timezone('Europe/Zurich')
 
-        # Timer-Variable initialisieren
+            # Timer-Variable initialisieren
         self.timer_counter = 60
         self.timer_id = None
 
@@ -55,6 +55,9 @@ class FinanzDatenGUI:
             # Timer-Label aktualisieren
             self.aktualisiere_timer_label()
 
+            # Fortschrittsbalken aktualisieren
+            self.progressbar["value"] = 0  # Zurücksetzen des Fortschrittsbalkens
+
         except Exception as e:
             messagebox.showerror("Fehler", f"Ein Fehler ist aufgetreten: {e}")
 
@@ -67,24 +70,29 @@ class FinanzDatenGUI:
 
         try:
             # Initiale Daten abrufen
-            self.start_progress_bar()
-            self.waehrungsdaten_abrufen(waehrungseingabe, period="1d", interval="1m")
+            self.waehrungsdaten_abrufen(waehrungseingabe, period="1h", interval="1m")
 
             # Timer starten oder neu starten
             if self.timer_id is not None:
-                self.master.after_cancel(self.timer_id)
+               self.master.after_cancel(self.timer_id)
             self.starte_timer(waehrungseingabe)
+
+            # Fortschrittsbalken starten
+            self.starte_fortschrittsbalken()
 
         except Exception as e:
             messagebox.showerror("Fehler", f"Ein Fehler ist aufgetreten: {e}")
-        finally:
-            self.stop_progress_bar()
 
     def starte_timer(self, waehrungseingabe):
         # Timer starten oder neu starten
         self.timer_counter = 60
         self.aktualisiere_timer_label()
         self.timer_id = self.master.after(1000, self.aktualisiere_timer, waehrungseingabe)
+
+    def starte_fortschrittsbalken(self):
+        self.progressbar["maximum"] = 60  # Maximale Zeit für den Fortschrittsbalken in Sekunden
+        self.progressbar["value"] = 0
+        self.aktualisiere_fortschrittsbalken()
 
     def aktualisiere_timer(self, waehrungseingabe):
         self.timer_counter -= 1
@@ -94,6 +102,9 @@ class FinanzDatenGUI:
             # Timer abgelaufen, Daten aktualisieren und Timer neu starten
             self.waehrungsdaten_abrufen(waehrungseingabe, period="1d", interval="1m")
             self.starte_timer(waehrungseingabe)
+
+            # Fortschrittsbalken starten
+            self.starte_fortschrittsbalken()
         else:
             # Timer weiter aktualisieren
             self.timer_id = self.master.after(1000, self.aktualisiere_timer, waehrungseingabe)
@@ -101,19 +112,25 @@ class FinanzDatenGUI:
     def aktualisiere_timer_label(self):
         self.timer_label.config(text=f"Nächste Aktualisierung in: {self.timer_counter} Sekunden")
 
-    def start_progress_bar(self):
-        self.progress_bar.start()
+    def aktualisiere_fortschrittsbalken(self):
+        current_value = self.progressbar["value"]
+        if current_value < self.progressbar["maximum"]:
+            self.progressbar["value"] += 1
+            self.master.after(1000, self.aktualisiere_fortschrittsbalken)
+        else:
+            # Fortschrittsbalken zurücksetzen
+            self.progressbar["value"] = 0
 
-    def stop_progress_bar(self):
-        self.progress_bar.stop()
-
+    def manuelle_aktualisierung(self):
+        waehrungseingabe = self.waehrung_combobox.get()
+        self.waehrungsdaten_abrufen(waehrungseingabe, period="1d", interval="1m")
 
 def main():
     root = tk.Tk()
     foto = tk.PhotoImage(file='appicon.png')
     root.wm_iconphoto(False, foto)
     app = FinanzDatenGUI(root)
-    root.geometry("800x600")  # Setze die Anfangsgröße des Fensters
+    root.geometry("900x650")  # Setze die Anfangsgröße des Fensters
     root.mainloop()
 
 
