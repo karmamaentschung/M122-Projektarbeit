@@ -43,7 +43,7 @@ class FinanzDatenGUI:
         self.timer_counter = 60
         self.timer_id = None
 
-    def waehrungsdaten_abrufen(self, waehrungseingabe, period="1d", interval="1h"):
+    def waehrungsdaten_abrufen(self, waehrungseingabe, period="1d", interval="1d"):
         try:
             crypto_ticker = yf.Ticker(waehrungseingabe)
             waehrungsdaten = crypto_ticker.history(period=period, interval=interval)
@@ -70,7 +70,7 @@ class FinanzDatenGUI:
 
         try:
             # Initiale Daten abrufen
-            self.waehrungsdaten_abrufen(waehrungseingabe, period="1h", interval="1m")
+            self.waehrungsdaten_abrufen(waehrungseingabe, period="1d", interval="1m")
 
             # Timer starten oder neu starten
             if self.timer_id is not None:
