@@ -1,7 +1,7 @@
 #!/usr/bin/python
 ################################################################
 # Datei: finance.py  
-# Autoren: Enrique Munoz, Florin Curiger und Karma Khamritshang
+# Autoren: Enrique Munoz, Florin Curiger and KARMA MÄNTSCHUNG
 ################################################################
 import tkinter as tk
 from tkinter import ttk
